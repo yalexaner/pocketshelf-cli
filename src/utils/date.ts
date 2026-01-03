@@ -5,6 +5,14 @@ export function cocoaToDate(cocoaTimestamp: number): Date {
   return new Date(COCOA_EPOCH + cocoaTimestamp * 1000);
 }
 
+export function dateToCocoaTimestamp(date: Date): number {
+  return (date.getTime() - COCOA_EPOCH) / 1000;
+}
+
+export function getCurrentCocoaTimestamp(): number {
+  return dateToCocoaTimestamp(new Date());
+}
+
 export function dateToLocalString(date: Date): string {
   return date.toLocaleDateString("en-US", {
     year: "numeric",

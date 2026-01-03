@@ -7,6 +7,9 @@ import {
 } from "./src/commands/list";
 import { showCommand, showSessionsCommand } from "./src/commands/show";
 import { statsCommand } from "./src/commands/stats";
+import { addBookCommand, addSessionCommand } from "./src/commands/add";
+import { editBookCommand, editSessionCommand } from "./src/commands/edit";
+import { deleteBookCommand, deleteSessionCommand } from "./src/commands/delete";
 
 program
   .name("bookshelf")
@@ -86,6 +89,133 @@ program
   .action(async () => {
     const opts = program.opts();
     await statsCommand({ file: opts.file, json: opts.json });
+  });
+
+// add commands
+const add = program.command("add").description("Add items to the library");
+
+add
+  .command("book [name]")
+  .description("Add a new book")
+  .option("--from <file>", "import book(s) from JSON file")
+  .option("-a, --author <name>", "author name")
+  .option("-t, --type <type>", "publication type (book/audiobook)", "book")
+  .option("--book-type <type>", "book type (paperback/hardcover/ebook)")
+  .option("-s, --shelf <name>", "shelf name", "To Read")
+  .option("--narrator <name>", "narrator (for audiobooks)")
+  .option("--isbn <isbn>", "ISBN number")
+  .option("--publisher <name>", "publisher name")
+  .option("--pages <range>", "page range (e.g., 1-350)")
+  .option("--duration <time>", "duration (e.g., 3600 or 1h30m)")
+  .action(async (name, cmdOpts) => {
+    const opts = program.opts();
+    await addBookCommand(name, {
+      file: opts.file,
+      from: cmdOpts.from,
+      author: cmdOpts.author,
+      type: cmdOpts.type,
+      bookType: cmdOpts.bookType,
+      shelf: cmdOpts.shelf,
+      narrator: cmdOpts.narrator,
+      isbn: cmdOpts.isbn,
+      publisher: cmdOpts.publisher,
+      pages: cmdOpts.pages,
+      duration: cmdOpts.duration,
+    });
+  });
+
+add
+  .command("session <book-id>")
+  .description("Add a reading session to a book")
+  .option("--start <value>", "starting page/time")
+  .option("--end <value>", "ending page/time")
+  .option("--notes <text>", "session notes")
+  .action(async (bookId, cmdOpts) => {
+    const opts = program.opts();
+    await addSessionCommand(bookId, {
+      file: opts.file,
+      start: cmdOpts.start,
+      end: cmdOpts.end,
+      notes: cmdOpts.notes,
+    });
+  });
+
+// edit commands
+const edit = program.command("edit").description("Edit items in the library");
+
+edit
+  .command("book <id>")
+  .description("Edit a book")
+  .option("-n, --name <name>", "book name")
+  .option("-a, --author <name>", "author name")
+  .option("-t, --type <type>", "publication type (book/audiobook)")
+  .option("--book-type <type>", "book type (paperback/hardcover/ebook)")
+  .option("-s, --shelf <name>", "shelf name")
+  .option("--narrator <name>", "narrator (for audiobooks)")
+  .option("--isbn <isbn>", "ISBN number")
+  .option("--publisher <name>", "publisher name")
+  .option("--pages <range>", "page range (e.g., 1-350)")
+  .option("--duration <time>", "duration (e.g., 3600 or 1h30m)")
+  .option("--description <text>", "book description")
+  .action(async (id, cmdOpts) => {
+    const opts = program.opts();
+    await editBookCommand(id, {
+      file: opts.file,
+      name: cmdOpts.name,
+      author: cmdOpts.author,
+      type: cmdOpts.type,
+      bookType: cmdOpts.bookType,
+      shelf: cmdOpts.shelf,
+      narrator: cmdOpts.narrator,
+      isbn: cmdOpts.isbn,
+      publisher: cmdOpts.publisher,
+      pages: cmdOpts.pages,
+      duration: cmdOpts.duration,
+      description: cmdOpts.description,
+    });
+  });
+
+edit
+  .command("session <id>")
+  .description("Edit a reading session")
+  .option("--start <value>", "starting page/time")
+  .option("--end <value>", "ending page/time")
+  .option("--notes <text>", "session notes")
+  .action(async (id, cmdOpts) => {
+    const opts = program.opts();
+    await editSessionCommand(id, {
+      file: opts.file,
+      start: cmdOpts.start,
+      end: cmdOpts.end,
+      notes: cmdOpts.notes,
+    });
+  });
+
+// delete commands
+const del = program.command("delete").description("Delete items from the library");
+
+del
+  .command("book <id>")
+  .description("Delete a book")
+  .option("--force", "skip confirmation")
+  .action(async (id, cmdOpts) => {
+    const opts = program.opts();
+    await deleteBookCommand(id, {
+      file: opts.file,
+      force: cmdOpts.force,
+    });
+  });
+
+del
+  .command("session <id>")
+  .description("Delete a reading session")
+  .option("--force", "skip confirmation")
+  .action(async (id, cmdOpts) => {
+    const opts = program.opts();
+    await deleteSessionCommand(id, {
+      file: opts.file,
+      force: cmdOpts.force,
+    });
   });
 
 program.parse();
