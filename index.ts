@@ -10,6 +10,7 @@ import { statsCommand } from "./src/commands/stats";
 import { addBookCommand, addSessionCommand } from "./src/commands/add";
 import { editBookCommand, editSessionCommand } from "./src/commands/edit";
 import { deleteBookCommand, deleteSessionCommand } from "./src/commands/delete";
+import { interactiveCommand } from "./src/commands/interactive";
 
 program
   .name("bookshelf")
@@ -216,6 +217,16 @@ del
       file: opts.file,
       force: cmdOpts.force,
     });
+  });
+
+// interactive command
+program
+  .command("interactive")
+  .alias("i")
+  .description("Launch interactive TUI mode")
+  .action(async () => {
+    const opts = program.opts();
+    await interactiveCommand({ file: opts.file });
   });
 
 program.parse();
