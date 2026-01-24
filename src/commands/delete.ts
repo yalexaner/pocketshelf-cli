@@ -30,18 +30,26 @@ export async function deleteBookCommand(
 
   // Find the book
   const normalizedId = id.toUpperCase();
-  const bookIndex = publications.findIndex(
-    (p) =>
-      p.id?.toUpperCase() === normalizedId ||
-      p.id?.toUpperCase().startsWith(normalizedId)
-  );
+  const matches = publications
+    .map((p, index) => ({ p, index }))
+    .filter(
+      ({ p }) =>
+        p.id?.toUpperCase() === normalizedId ||
+        p.id?.toUpperCase().startsWith(normalizedId)
+    );
 
-  if (bookIndex === -1) {
+  if (matches.length === 0) {
     console.error(`Error: Book not found: ${id}`);
     process.exit(1);
   }
+  if (matches.length > 1) {
+    console.error(
+      `Error: Multiple books match "${id}". Please provide a longer ID.`
+    );
+    process.exit(1);
+  }
 
-  const book = publications[bookIndex]!;
+  const { p: book, index: bookIndex } = matches[0]!;
 
   // Confirm deletion unless --force
   if (!options.force) {
@@ -74,8 +82,7 @@ export async function deleteSessionCommand(
 
   // Find the session across all books
   const normalizedId = sessionId.toUpperCase();
-  let foundSessionIndex = -1;
-  let foundBook = null;
+  const matches: { book: (typeof publications)[number]; index: number }[] = [];
 
   for (const book of publications) {
     const sessions = book.readingSessions ?? [];
@@ -85,17 +92,22 @@ export async function deleteSessionCommand(
         s.id?.toUpperCase().startsWith(normalizedId)
     );
     if (index !== -1) {
-      foundSessionIndex = index;
-      foundBook = book;
-      break;
+      matches.push({ book, index });
     }
   }
 
-  if (foundSessionIndex === -1 || !foundBook) {
+  if (matches.length === 0) {
     console.error(`Error: Session not found: ${sessionId}`);
     process.exit(1);
   }
+  if (matches.length > 1) {
+    console.error(
+      `Error: Multiple sessions match "${sessionId}". Please provide a longer ID.`
+    );
+    process.exit(1);
+  }
 
+  const { book: foundBook, index: foundSessionIndex } = matches[0]!;
   const session = foundBook.readingSessions![foundSessionIndex]!;
 
   // Confirm deletion unless --force

@@ -138,6 +138,16 @@ export async function editSessionCommand(
     foundSession.notes = options.notes ? [options.notes] : [];
   }
 
+  // Validate session bounds
+  const startValue = foundSession.startValue ?? 0;
+  const endValue = foundSession.endValue ?? 0;
+  if (startValue < 0 || endValue < 0 || endValue < startValue) {
+    console.error(
+      "Error: End must be >= start and values must be non-negative"
+    );
+    process.exit(1);
+  }
+
   await saveBackup(backup, options.file);
 
   console.log(`Updated session for "${foundBook.name}"`);

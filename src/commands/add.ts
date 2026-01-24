@@ -129,18 +129,18 @@ async function importBooksFromFile(
   let addedCount = 0;
   for (const book of booksToImport) {
     const newBook: Publication = {
+      ...book,
       id: generateId(),
       source: "manual",
       added: getCurrentCocoaTimestamp(),
-      shelf: "To Read",
-      start: 0,
-      end: 0,
-      progressMeasurementType: "pages",
-      readingSessions: [],
-      categoryLabels: [],
-      bookGenre: [],
-      glossaryItems: [],
-      ...book,
+      shelf: book.shelf ?? "To Read",
+      start: book.start ?? 0,
+      end: book.end ?? 0,
+      progressMeasurementType: book.progressMeasurementType ?? "pages",
+      readingSessions: book.readingSessions ?? [],
+      categoryLabels: book.categoryLabels ?? [],
+      bookGenre: book.bookGenre ?? [],
+      glossaryItems: book.glossaryItems ?? [],
     };
 
     publications.push(newBook);
@@ -157,7 +157,6 @@ interface AddSessionOptions {
   file?: string;
   start?: string;
   end?: string;
-  date?: string;
   notes?: string;
 }
 

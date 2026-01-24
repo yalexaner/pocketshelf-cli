@@ -63,10 +63,11 @@ export async function showCommand(
   console.log(`Title: ${pub.name ?? "Unknown"}`);
   console.log(`Author: ${pub.author ?? "Unknown"}`);
 
-  const typeInfo = [pub.publicationType, pub.bookType]
-    .filter(Boolean)
-    .join(" (");
-  console.log(`Type: ${typeInfo}${pub.bookType ? ")" : ""}`);
+  const typeInfo =
+    pub.publicationType && pub.bookType
+      ? `${pub.publicationType} (${pub.bookType})`
+      : pub.publicationType ?? pub.bookType ?? "Unknown";
+  console.log(`Type: ${typeInfo}`);
 
   console.log(`Shelf: ${pub.shelf ?? "Unknown"}`);
 

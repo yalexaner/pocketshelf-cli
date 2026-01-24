@@ -16,7 +16,7 @@ export async function infoCommand(options: InfoOptions): Promise<void> {
       JSON.stringify(
         {
           file: filePath,
-          appVersion: backup.appVersion,
+          appVersion: backup.appVersion ?? "unknown",
           publicationCount: publications.length,
         },
         null,
