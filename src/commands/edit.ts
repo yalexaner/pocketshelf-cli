@@ -116,22 +116,49 @@ export async function editSessionCommand(
   }
 
   // Apply updates
+  const progressType = foundBook.progressMeasurementType ?? "pages";
+
   if (options.start !== undefined) {
-    const value = parseInt(options.start, 10);
-    if (isNaN(value)) {
-      console.error("Error: Start must be a number");
-      process.exit(1);
+    if (progressType === "time") {
+      const value = parseDuration(options.start);
+      if (value === null) {
+        console.error("Error: Start must be a valid duration");
+        process.exit(1);
+      }
+      foundSession.startValue = value;
+    } else {
+      const value = parseInt(options.start, 10);
+      if (isNaN(value)) {
+        console.error("Error: Start must be a number");
+        process.exit(1);
+      }
+      foundSession.startValue = value;
     }
-    foundSession.startValue = value;
   }
 
   if (options.end !== undefined) {
-    const value = parseInt(options.end, 10);
-    if (isNaN(value)) {
-      console.error("Error: End must be a number");
-      process.exit(1);
+    if (progressType === "time") {
+      const value = parseDuration(options.end);
+      if (value === null) {
+        console.error("Error: End must be a valid duration");
+        process.exit(1);
+      }
+      foundSession.endValue = value;
+    } else {
+      const value = parseInt(options.end, 10);
+      if (isNaN(value)) {
+        console.error("Error: End must be a number");
+        process.exit(1);
+      }
+      foundSession.endValue = value;
     }
-    foundSession.endValue = value;
+  }
+
+  const effectiveStart = foundSession.startValue ?? 0;
+  const effectiveEnd = foundSession.endValue ?? 0;
+  if (effectiveStart > effectiveEnd) {
+    console.error("Error: End must be greater than or equal to Start");
+    process.exit(1);
   }
 
   if (options.notes !== undefined) {

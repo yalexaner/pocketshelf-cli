@@ -141,13 +141,14 @@ async function bookMenu(backup: Backup, book: Publication, filePath: string): Pr
         backup = await addSessionInteractive(backup, book, filePath);
         book = backup.publications?.find((b) => b.id === book.id) ?? book;
         break;
-      case "delete":
+      case "delete": {
         const deleted = await deleteBookInteractive(backup, book, filePath);
         if (deleted) {
           backup = deleted;
           return backup;
         }
         break;
+      }
     }
   }
 }
@@ -291,6 +292,10 @@ async function addBookInteractive(backup: Backup, filePath: string): Promise<Bac
         console.log("\n  ⚠ Invalid page range format. Using 0-0.\n");
       }
     }
+  }
+
+  if (publicationType === "audiobook" && progressMeasurementType === "pages") {
+    progressMeasurementType = "time";
   }
 
   let narrator: string | undefined;
@@ -667,6 +672,11 @@ async function addSessionInteractive(
       console.log("\n  ✗ Invalid page number. Session not added.\n");
       return backup;
     }
+  }
+
+  if (startValue > endValue) {
+    console.log("\n  ✗ End must be greater than or equal to Start. Session not added.\n");
+    return backup;
   }
 
   const notesInput = await p.text({

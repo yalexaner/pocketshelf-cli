@@ -61,6 +61,10 @@ export async function addBookCommand(
     progressMeasurementType = "time";
   }
 
+  if ((options.type ?? "book") === "audiobook" && !options.pages && !options.duration) {
+    progressMeasurementType = "time";
+  }
+
   const newBook: Publication = {
     id: generateId(),
     name,
@@ -182,11 +186,27 @@ export async function addSessionCommand(
   }
 
   const progressType = book.progressMeasurementType ?? "pages";
-  const startValue = options.start ? parseInt(options.start, 10) : 0;
-  const endValue = options.end ? parseInt(options.end, 10) : 0;
+  let startValue: number;
+  let endValue: number;
 
-  if (isNaN(startValue) || isNaN(endValue)) {
-    console.error("Error: Start and end must be numbers");
+  if (progressType === "time") {
+    startValue = options.start ? parseDuration(options.start) ?? NaN : 0;
+    endValue = options.end ? parseDuration(options.end) ?? NaN : 0;
+    if (isNaN(startValue) || isNaN(endValue)) {
+      console.error("Error: Start and end must be valid durations");
+      process.exit(1);
+    }
+  } else {
+    startValue = options.start ? parseInt(options.start, 10) : 0;
+    endValue = options.end ? parseInt(options.end, 10) : 0;
+    if (isNaN(startValue) || isNaN(endValue)) {
+      console.error("Error: Start and end must be numbers");
+      process.exit(1);
+    }
+  }
+
+  if (startValue > endValue) {
+    console.error("Error: End must be greater than or equal to Start");
     process.exit(1);
   }
 
