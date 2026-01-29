@@ -10,5 +10,5 @@ Features and improvements to implement later.
 
 ## Future Phases
 
-- [ ] Interactive mode with @clack/prompts
+- [x] Interactive mode with @clack/prompts
 - [ ] React Native app (Windows first, then macOS/Linux)
