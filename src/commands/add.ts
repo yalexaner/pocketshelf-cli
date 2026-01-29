@@ -189,6 +189,13 @@ export async function addSessionCommand(
     process.exit(1);
   }
 
+  if (startValue < 0 || endValue < 0 || endValue < startValue) {
+    console.error(
+      "Error: End must be >= start and values must be non-negative"
+    );
+    process.exit(1);
+  }
+
   const newSession: ReadingSession = {
     id: generateId(),
     startDate: getCurrentCocoaTimestamp(),
